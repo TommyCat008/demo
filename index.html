@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <title>GeoJSON</title>
+    <link rel="stylesheet" href="//a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=eea8e990d8a35eeec37314f550058d61"></script>
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script type="text/javascript">
+        var map = new AMap.Map('container', {
+            mapStyle: 'amap://styles/08f1e06fb5c383406d4e4a12dd243ac4',
+            center: [116.996838977, 36.9096131154],
+            // features: ['bg', 'road'],
+            zoom: 12,
+            viewMode: '3D',
+            buildingAnimation: false,
+            showIndoorMap: false,
+        });
+        var colors = ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8'];
+        var idx = 0;
+        ajax('./JN_eightstreet.geojson', function(err, geoJSON) {
+            if (!err) {
+                var geojson = new AMap.GeoJSON({
+                    geoJSON: geoJSON,
+                    // 还可以自定义getMarker和getPolyline
+                    getPolygon: function(geojson, lnglats) {
+                        // 计算面积
+                        var area = AMap.GeometryUtil.ringArea(lnglats[0])
+                        var color = colors[idx++ % colors.length];
+                        return new AMap.Polygon({
+                            path: lnglats,
+                            fillOpacity: 0.5, // 面积越大透明度越高
+                            strokeWeight: 3,
+                            strokeColor: 'white',
+                            fillColor: color,
+                        });
+                    }
+                });
+
+                geojson.setMap(map);
+
+                log.success('GeoJSON 数据加载完成')
+            } else {
+                log.error('GeoJSON 服务请求失败')
+            }
+        })
+
+        // 加载巡航的内容
+        var object3Dlayer = new AMap.Object3DLayer();
+        map.add(object3Dlayer);
+
+        var radar;
+        var buildRadar = function() {
+            radar = new AMap.Object3D.Mesh();
+            radar.transparent = true;
+            radar.backOrFront = 'front';
+
+            var geometry = radar.geometry;
+            var radius = 2000; // 米
+            radius = radius / map.getResolution(map.getCenter(), 20);
+            var unit = 1;
+            var range = 2000;
+            var count = range / unit;
+
+            for (var i = 0; i < count; i += 1) {
+                var angle1 = i * unit * Math.PI / 180;
+                var angle2 = (i + 1) * unit * Math.PI / 180;
+
+                var p1x = Math.cos(angle1) * radius;
+                var p1y = Math.sin(angle1) * radius;
+                var p2x = Math.cos(angle2) * radius;
+                var p2y = Math.sin(angle2) * radius;
+
+                geometry.vertices.push(0, 0, 0);
+                geometry.vertices.push(p1x, p1y, 0);
+                geometry.vertices.push(p2x, p2y, 0);
+
+                var opacityStart = getOpacity(i / count);
+                var opacityEnd = getOpacity((i + 1) / count);
+
+                geometry.vertexColors.push(0, 1, 0.2, opacityStart);
+                geometry.vertexColors.push(0, 1, 0.2, opacityStart);
+                geometry.vertexColors.push(0, 1, 0.2, opacityEnd);
+            }
+
+            radar.position(map.getCenter());
+
+            object3Dlayer.add(radar);
+        };
+
+        function getOpacity(scale) {
+            return 1 - Math.pow(scale, 0.3);
+        }
+
+        function scan() {
+            radar.rotateZ(-2);
+            AMap.Util.requestAnimFrame(scan);
+        }
+
+        buildRadar();
+        scan();
+
+        // 可以添加建模的内容
+        // https://lbs.amap.com/api/javascript-api/example/mesh/3d-gltf
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>北京各区行政区面</title>
+    <style>
+        html,
+        body,
+        #container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container" class="container"></div>
+    <script src="//webapi.amap.com/maps?v=1.4.15&key=eb14d99791392d6f5b3501a1a4e071f7"></script>
+    <script src="//webapi.amap.com/loca?v=1.3.0&key=eb14d99791392d6f5b3501a1a4e071f7"></script>
+    <script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
+    <script>
+        var map = new AMap.Map('container', {
+            mapStyle: 'amap://styles/1de318cbb8d12c02303a22c550b9ccc9',
+            pitch: 0,
+            features: ['bg', 'road'],
+            zoom: 9,
+            viewMode: '3D'
+        });
+
+        map.on('mapload', function() {
+            map.getMap().plugin(['AMap.ControlBar'], function() {
+                var controlBar = new AMap.ControlBar();
+                map.getMap().addControl(controlBar);
+            });
+        });
+
+        var colors = ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8'];
+
+        $.get('https://a.amap.com/Loca/static/mock/bj_district_wkt.json', function(data) {
+            var layer = new Loca.PolygonLayer({
+                map: map,
+                fitView: true
+            });
+
+            layer.setData(data, {
+                lnglat: 'coordinates'
+            });
+
+            var idx = 0;
+
+            layer.setOptions({
+                style: {
+                    height: function() {
+                        return Math.random() * 20000;
+                    },
+                    opacity: 0.8,
+                    color: function() {
+                        return colors[idx++ % colors.length];
+                    }
+                }
+            });
+
+            layer.render();
+        });
+    </script>
+</body>
+
+</html>
