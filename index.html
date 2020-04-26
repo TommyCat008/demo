@@ -25,11 +25,12 @@
         var map = new AMap.Map('container', {
             mapStyle: 'amap://styles/08f1e06fb5c383406d4e4a12dd243ac4',
             center: [116.996838977, 36.9096131154],
+            layers: [new AMap.TileLayer.Satellite()],
+            zoom: 13,
             // features: ['bg', 'road'],
-            zoom: 12,
             viewMode: '3D',
-            buildingAnimation: false,
-            showIndoorMap: false,
+            // buildingAnimation: false,
+            // showIndoorMap: false,
         });
         var colors = ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8'];
         var idx = 0;
@@ -53,7 +54,6 @@
                 });
 
                 geojson.setMap(map);
-
                 log.success('GeoJSON 数据加载完成')
             } else {
                 log.error('GeoJSON 服务请求失败')
@@ -138,6 +138,8 @@
         markers.push(marker);
         var overlayGroups = new AMap.OverlayGroup(markers);
         map.add(overlayGroups);
+
+
         // 可以添加建模的内容
         // https://lbs.amap.com/api/javascript-api/example/mesh/3d-gltf
     </script>
