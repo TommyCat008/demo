@@ -115,6 +115,29 @@
         buildRadar();
         scan();
 
+        // 添加覆盖物
+        let center = map.getCenter();
+        // 创建一个 Icon
+        var icon = new AMap.Icon({
+            // 图标尺寸
+            size: new AMap.Size(45, 45),
+            // 图标的取图地址
+            image: './camera.svg',
+            // 图标所用图片大小
+            imageSize: new AMap.Size(45, 45),
+            // 图标取图偏移量
+            imageOffset: new AMap.Pixel(0, 0)
+        });
+        var marker = new AMap.Marker({
+            position: new AMap.LngLat(center.lng, center.lat),
+            icon: icon,
+            offset: new AMap.Pixel(-20, -20)
+        });
+
+        var markers = [];
+        markers.push(marker);
+        var overlayGroups = new AMap.OverlayGroup(markers);
+        map.add(overlayGroups);
         // 可以添加建模的内容
         // https://lbs.amap.com/api/javascript-api/example/mesh/3d-gltf
     </script>
