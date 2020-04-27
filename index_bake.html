@@ -25,48 +25,23 @@
     <script src="//a.amap.com/Loca/static/dist/jquery.min.js"></script>
     <script>
         var map = new AMap.Map('container', {
-            mapStyle: 'amap://styles/1de318cbb8d12c02303a22c550b9ccc9',
-            pitch: 0,
-            features: ['bg', 'road'],
-            zoom: 9,
-            viewMode: '3D'
+            zoom: 3,
+            //viewMode:'3D',
+            center: [-99.241291, 39.51401]
         });
-
-        map.on('mapload', function() {
-            map.getMap().plugin(['AMap.ControlBar'], function() {
-                var controlBar = new AMap.ControlBar();
-                map.getMap().addControl(controlBar);
-            });
-        });
-
-        var colors = ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8'];
-
-        $.get('https://a.amap.com/Loca/static/mock/bj_district_wkt.json', function(data) {
-            var layer = new Loca.PolygonLayer({
-                map: map,
-                fitView: true
-            });
-
-            layer.setData(data, {
-                lnglat: 'coordinates'
-            });
-
-            var idx = 0;
-
-            layer.setOptions({
-                style: {
-                    height: function() {
-                        return Math.random() * 20000;
-                    },
-                    opacity: 0.8,
-                    color: function() {
-                        return colors[idx++ % colors.length];
-                    }
-                }
-            });
-
-            layer.render();
-        });
+        var wms = new AMap.TileLayer.WMTS({
+            url: 'http://t0.tianditu.gov.cn/img_w/wmts',
+            blend: false,
+            tileSize: 256,
+            params: {
+                tk: 'fb2f1e543ab14f984cac70660ff10093',
+                SERVICE: 'WMTS',
+                Layer: 'ibo',
+                Version: '1.0.0',
+                Format: 'tiles'
+            }
+        })
+        wms.setMap(map)
     </script>
 </body>
 

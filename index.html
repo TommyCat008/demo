@@ -45,26 +45,14 @@
                 labelzIndex: 130, // 地图标注显示顺序，大于110即可将底图上的默认标注显示在覆盖物（圆、折线、面）之上。
                 pitch: 30, // 俯仰角度，2D地图下无效
                 zoom: 12, // 地图默认缩放的级别
+                zooms: [12, 13],
                 skyColor: '#41A863',
                 mapStyle: 'amap://styles/grey',
+                features: [],
                 layers: [
                     new AMap.TileLayer.Satellite()
                 ]
             });
-
-            // var wms = new AMap.TileLayer.WMTS({
-            //     // url: 'http://t0.tianditu.gov.cn/img_c/wmts',
-            //     url: 'http://t0.tianditu.gov.cn/img_w/wmts',
-            //     blend: false,
-            //     tileSize: 256,
-            //     params: {
-            //         tk: 'fb2f1e543ab14f984cac70660ff10093',
-            //         'Layer': 'img',
-            //         Version: '1.0.0',
-            //         Format: 'image/png'
-            //     }
-            // })
-            // wms.setMap(map)
 
             //添加高度面
             var object3Dlayer = new AMap.Object3DLayer({
@@ -198,6 +186,23 @@
             markers.push(marker);
             var overlayGroups = new AMap.OverlayGroup(markers);
             map.add(overlayGroups);
+
+            // 添加wms的功能暂时不可用，代码打开之后会展示查不到资源
+
+            // var wms = new AMap.TileLayer.WMTS({
+            //     url: 'http://t0.tianditu.gov.cn/img_c/wmts',
+            //     // blend: false,
+            //     // tileSize: 256,
+            //     params: {
+            //         // 'Layer': 'img',
+            //         // Version: '1.0.0',
+            //         // Format: 'image/png',
+            //         tk: 'fb2f1e543ab14f984cac70660ff10093',
+            //         STYLE: 'default',
+            //         Format: 'tiles',
+            //     }
+            // })
+            // wms.setMap(map)
 
         });
         // var map = new AMap.Map('container', {
