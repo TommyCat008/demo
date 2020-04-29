@@ -36,7 +36,7 @@
             //     mask.push([bounds[i]])
             // }
             var imageLayer = new AMap.ImageLayer({
-                url: 'net.svg',
+                url: 'grid.svg',
                 bounds: new AMap.Bounds(
                     [116.134275, 36.951944], [117.144275, 37.961944]
                 ),
@@ -63,21 +63,6 @@
                     imageLayer
                 ]
             });
-
-            var lineArr = [
-                ['75.757904', '38.118117'],
-                ['117.375719', '24.598057']
-            ];
-            var polyline = new AMap.Polyline({
-                path: lineArr, // 设置线覆盖物路径
-                strokeColor: '#3366FF', // 线颜色
-                strokeOpacity: 1, // 线透明度
-                strokeWeight: 1, // 线宽
-                strokeStyle: 'solid', // 线样式
-                strokeDasharray: [10, 5], // 补充线样式
-                geodesic: true // 绘制大地线
-            });
-            polyline.setMap(map);
 
             // 添加高度面
             // var object3Dlayer = new AMap.Object3DLayer({
