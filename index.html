@@ -12,232 +12,243 @@
             width: 100%;
             height: 100%;
         }
+        
+        .grid {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-image: url('./bigping.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
     </style>
     <title>地图demo</title>
     <link rel="stylesheet" href="//a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
     <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
-    <script language="javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=eea8e990d8a35eeec37314f550058d61&plugin=Map3D,AMap.DistrictSearch"></script>
+    <script language="javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=eea8e990d8a35eeec37314f550058d61&plugin=Map3D"></script>
 </head>
 
 <body>
+    <div class="grid"></div>
     <div id="container"></div>
+    <script src="./grid/grid.js"></script>
+    <script src="./bounds.js"></script>
+    <script>
+        let width = document.body.clientWidth;
+        let height = document.body.clientHeight;
+        let colCount = Math.ceil(width / 80);
+        let rowCount = Math.ceil(height / 80);
+        let grid = new Grid({
+            container: document.getElementsByClassName('grid')[0], // 必须项
+            colCount: colCount,
+            rowCount: rowCount,
+            width: '100%',
+            height: '100%',
+        });
+        // grid.setGridStyleByIndex(0, {
+        //     "background": "red"
+        // });
+        // grid.setGridStyleByIndex(6, {
+        //     "background": "green"
+        // });
+        // grid.setGridStyleByIndex(12, {
+        //     "background": "yellow"
+        // });
+        // grid.setGridStyleByIndex(18, {
+        //     "background": "blue"
+        // });
+        // grid.setGridStyleByIndex(24, {
+        //     "background": "orange"
+        // });
+        let grids = grid.getGrids();
+    </script>
+
+
     <script type="text/javascript">
         // 掩模
-        var district = new AMap.DistrictSearch({
-            subdistrict: 0,
-            extensions: 'all',
-            level: 'district'
+        var bounds = getBounds();
+        var mask = []
+        for (var i = 0; i < bounds.length; i += 1) {
+            mask.push([bounds[i]])
+        }
+
+        // 外部样式
+        // var pathArray = [
+        //     outer
+        // ];
+
+        var map = new AMap.Map('container', {
+            mask: mask,
+            center: [117.034275, 36.921944],
+            viewMode: '3D',
+            showLabel: false,
+            // labelzIndex: 130, // 地图标注显示顺序，大于110即可将底图上的默认标注显示在覆盖物（圆、折线、面）之上。
+            pitch: 0, // 俯仰角度，2D地图下无效
+            zoom: 11.5, // 地图默认缩放的级别
+            zooms: [11, 13],
+            skyColor: '#41A863',
+            // dragEnable: false, // 地图不可被拖拽
+            mapStyle: 'amap://styles/21dc88251ce0e433b02485182ceb0f67',
+            features: [],
+            layers: [
+                new AMap.TileLayer.Satellite({
+                    opacity: 1
+                }),
+            ]
         });
-        var map;
-        district.search('济阳区', function(status, result) {
-            // var bounds = result.districtList[0].boundaries;
-            // var mask = []
-            // for (var i = 0; i < bounds.length; i += 1) {
-            //     mask.push([bounds[i]])
-            // }
-            var imageLayer = new AMap.ImageLayer({
-                url: 'grid.svg',
-                bounds: new AMap.Bounds(
-                    [116.134275, 36.951944], [117.144275, 37.961944]
-                ),
-                zooms: [11, 13]
-            });
 
-            map = new AMap.Map('container', {
-                // mask: mask,
-                center: [117.134275, 36.951944],
-                // disableSocket: true,
-                viewMode: '3D',
-                showLabel: false,
-                // labelzIndex: 130, // 地图标注显示顺序，大于110即可将底图上的默认标注显示在覆盖物（圆、折线、面）之上。
-                pitch: 0, // 俯仰角度，2D地图下无效
-                zoom: 11, // 地图默认缩放的级别
-                zooms: [11, 13],
-                skyColor: '#41A863',
-                mapStyle: 'amap://styles/grey',
-                features: [],
-                layers: [
-                    new AMap.TileLayer.Satellite({
-                        opacity: 0.5
-                    }),
-                    imageLayer
-                ]
-            });
+        // 设置可移动范围
+        // map.setLimitBounds(new AMap.Bounds(
+        //     [116.134275, 36.451944], [119.144275, 38.961944]
+        // ));
 
-            // 添加高度面
-            // var object3Dlayer = new AMap.Object3DLayer({
-            //     zIndex: 1
-            // });
-            // map.add(object3Dlayer)
-            // var height = -4000;
-            // var color = '#5eb4ea'; //rgba
-            // var wall = new AMap.Object3D.Wall({
-            //     path: bounds,
-            //     height: height,
-            //     color: color
-            // });
-            // wall.transparent = true
-            // object3Dlayer.add(wall)
+        // 添加高度面
+        // var object3Dlayer = new AMap.Object3DLayer({
+        //     zIndex: 1
+        // });
+        // map.add(object3Dlayer)
+        // var height = -4000;
+        // var color = '#5eb4ea'; //rgba
+        // var wall = new AMap.Object3D.Wall({
+        //     path: bounds,
+        //     height: height,
+        //     color: color
+        // });
+        // wall.transparent = true
+        // object3Dlayer.add(wall)
 
-            //添加描边
-            // for (var i = 0; i < bounds.length; i += 1) {
-            //     new AMap.Polyline({
-            //         path: bounds[i],
-            //         strokeColor: '#5eb4ea',
-            //         strokeWeight: 3,
-            //         map: map
-            //     })
-            // }
+        // 添加描边
+        // for (var i = 0; i < bounds.length; i += 1) {
+        //     new AMap.Polyline({
+        //         path: bounds[i],
+        //         strokeColor: '#5eb4ea',
+        //         strokeWeight: 3,
+        //         map: map
+        //     })
+        // }
 
-            // 尝试添加热力点
-            // var heatmap;
-            // map.plugin(["AMap.Heatmap"], function() {
-            //     //初始化heatmap对象
-            //     heatmap = new AMap.Heatmap(map, {
-            //         radius: 25, //给定半径
-            //         opacity: [0, 0.8]
-            //             /*,
-            //             gradient:{
-            //                 0.5: 'blue',
-            //                 0.65: 'rgb(117,211,248)',
-            //                 0.7: 'rgb(0, 255, 0)',
-            //                 0.9: '#ffea00',
-            //                 1.0: 'red'
-            //             }
-            //              */
-            //     });
-            //     heatmap.setDataSet({
-            //         data: heatmapData,
-            //         max: 100
-            //     });
-            // });
+        // 加载GeoJSON文件
+        var colors = ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8'];
+        var idx = 0;
+        ajax('./JN_eightstreet.geojson', function(err, geoJSON) {
+            if (!err) {
+                var geojson = new AMap.GeoJSON({
+                    geoJSON: geoJSON,
+                    // 还可以自定义getMarker和getPolyline
+                    getPolygon: function(geojson, lnglats) {
+                        // 计算面积
+                        var area = AMap.GeometryUtil.ringArea(lnglats[0])
+                        var color = colors[idx++ % colors.length];
+                        return new AMap.Polygon({
+                            path: lnglats,
+                            fillOpacity: 0, // 面积越大透明度越高
+                            strokeWeight: 3,
+                            strokeColor: 'white',
+                            fillColor: color,
+                        });
+                    }
+                });
+                geojson.setMap(map);
+            } else {
+                log.error('GeoJSON 服务请求失败')
+            }
+        })
 
-            // 加载GeoJSON文件
-            var colors = ['#ffffcc', '#a1dab4', '#41b6c4', '#225ea8'];
-            var idx = 0;
-            ajax('./JN_eightstreet.geojson', function(err, geoJSON) {
-                if (!err) {
-                    var geojson = new AMap.GeoJSON({
-                        geoJSON: geoJSON,
-                        // 还可以自定义getMarker和getPolyline
-                        getPolygon: function(geojson, lnglats) {
-                            // 计算面积
-                            var area = AMap.GeometryUtil.ringArea(lnglats[0])
-                            var color = colors[idx++ % colors.length];
-                            return new AMap.Polygon({
-                                path: lnglats,
-                                fillOpacity: 0.5, // 面积越大透明度越高
-                                strokeWeight: 3,
-                                strokeColor: 'white',
-                                fillColor: color,
-                            });
-                        }
-                    });
-                    geojson.setMap(map);
-                } else {
-                    log.error('GeoJSON 服务请求失败')
-                }
-            })
+        // 加载巡航的内容
+        // var object3Dlayer = new AMap.Object3DLayer();
+        // map.add(object3Dlayer);
+        // var radar;
+        // var buildRadar = function() {
+        //     radar = new AMap.Object3D.Mesh();
+        //     radar.transparent = true;
+        //     radar.backOrFront = 'front';
 
+        //     var geometry = radar.geometry;
+        //     var radius = 2000; // 米
+        //     radius = radius / map.getResolution(map.getCenter(), 20);
+        //     var unit = 1;
+        //     var range = 2000;
+        //     var count = range / unit;
 
+        //     for (var i = 0; i < count; i += 1) {
+        //         var angle1 = i * unit * Math.PI / 180;
+        //         var angle2 = (i + 1) * unit * Math.PI / 180;
 
-            // 加载巡航的内容
-            // var object3Dlayer = new AMap.Object3DLayer();
-            // map.add(object3Dlayer);
+        //         var p1x = Math.cos(angle1) * radius;
+        //         var p1y = Math.sin(angle1) * radius;
+        //         var p2x = Math.cos(angle2) * radius;
+        //         var p2y = Math.sin(angle2) * radius;
 
-            // var radar;
-            // var buildRadar = function() {
-            //     radar = new AMap.Object3D.Mesh();
-            //     radar.transparent = true;
-            //     radar.backOrFront = 'front';
+        //         geometry.vertices.push(0, 0, 0);
+        //         geometry.vertices.push(p1x, p1y, 0);
+        //         geometry.vertices.push(p2x, p2y, 0);
 
-            //     var geometry = radar.geometry;
-            //     var radius = 2000; // 米
-            //     radius = radius / map.getResolution(map.getCenter(), 20);
-            //     var unit = 1;
-            //     var range = 2000;
-            //     var count = range / unit;
+        //         var opacityStart = getOpacity(i / count);
+        //         var opacityEnd = getOpacity((i + 1) / count);
 
-            //     for (var i = 0; i < count; i += 1) {
-            //         var angle1 = i * unit * Math.PI / 180;
-            //         var angle2 = (i + 1) * unit * Math.PI / 180;
+        //         geometry.vertexColors.push(0, 1, 0.2, opacityStart);
+        //         geometry.vertexColors.push(0, 1, 0.2, opacityStart);
+        //         geometry.vertexColors.push(0, 1, 0.2, opacityEnd);
+        //     }
 
-            //         var p1x = Math.cos(angle1) * radius;
-            //         var p1y = Math.sin(angle1) * radius;
-            //         var p2x = Math.cos(angle2) * radius;
-            //         var p2y = Math.sin(angle2) * radius;
+        //     radar.position(map.getCenter());
 
-            //         geometry.vertices.push(0, 0, 0);
-            //         geometry.vertices.push(p1x, p1y, 0);
-            //         geometry.vertices.push(p2x, p2y, 0);
+        //     object3Dlayer.add(radar);
+        // };
 
-            //         var opacityStart = getOpacity(i / count);
-            //         var opacityEnd = getOpacity((i + 1) / count);
+        // function getOpacity(scale) {
+        //     return 1 - Math.pow(scale, 0.3);
+        // }
 
-            //         geometry.vertexColors.push(0, 1, 0.2, opacityStart);
-            //         geometry.vertexColors.push(0, 1, 0.2, opacityStart);
-            //         geometry.vertexColors.push(0, 1, 0.2, opacityEnd);
-            //     }
+        // function scan() {
+        //     radar.rotateZ(-2);
+        //     AMap.Util.requestAnimFrame(scan);
+        // }
 
-            //     radar.position(map.getCenter());
+        // buildRadar();
+        // scan();
 
-            //     object3Dlayer.add(radar);
-            // };
+        // 添加摄像头图标
+        // let center = map.getCenter();
+        // // 创建一个 Icon
+        // var icon = new AMap.Icon({
+        //     // 图标尺寸
+        //     size: new AMap.Size(100, 100),
+        //     // 图标的取图地址
+        //     image: './test1.gif',
+        //     // 图标所用图片大小
+        //     imageSize: new AMap.Size(100, 100),
+        //     // 图标取图偏移量
+        //     imageOffset: new AMap.Pixel(0, 0)
+        // });
+        // var marker = new AMap.Marker({
+        //     position: new AMap.LngLat(center.lng, center.lat),
+        //     icon: icon,
+        //     offset: new AMap.Pixel(-20, -20)
+        // });
 
-            // function getOpacity(scale) {
-            //     return 1 - Math.pow(scale, 0.3);
-            // }
+        // var markers = [];
+        // markers.push(marker);
+        // var overlayGroups = new AMap.OverlayGroup(markers);
+        // map.add(overlayGroups);
 
-            // function scan() {
-            //     radar.rotateZ(-2);
-            //     AMap.Util.requestAnimFrame(scan);
-            // }
+        // 添加wms的功能暂时不可用，代码打开之后会展示查不到资源
 
-            // buildRadar();
-            // scan();
-
-            // 添加摄像头图标
-            // let center = map.getCenter();
-            // // 创建一个 Icon
-            // var icon = new AMap.Icon({
-            //     // 图标尺寸
-            //     size: new AMap.Size(100, 100),
-            //     // 图标的取图地址
-            //     image: './test1.gif',
-            //     // 图标所用图片大小
-            //     imageSize: new AMap.Size(100, 100),
-            //     // 图标取图偏移量
-            //     imageOffset: new AMap.Pixel(0, 0)
-            // });
-            // var marker = new AMap.Marker({
-            //     position: new AMap.LngLat(center.lng, center.lat),
-            //     icon: icon,
-            //     offset: new AMap.Pixel(-20, -20)
-            // });
-
-            // var markers = [];
-            // markers.push(marker);
-            // var overlayGroups = new AMap.OverlayGroup(markers);
-            // map.add(overlayGroups);
-
-            // 添加wms的功能暂时不可用，代码打开之后会展示查不到资源
-
-            // var wms = new AMap.TileLayer.WMTS({
-            //     url: 'http://t0.tianditu.gov.cn/img_c/wmts',
-            //     // blend: false,
-            //     // tileSize: 256,
-            //     params: {
-            //         // 'Layer': 'img',
-            //         // Version: '1.0.0',
-            //         // Format: 'image/png',
-            //         tk: 'fb2f1e543ab14f984cac70660ff10093',
-            //         STYLE: 'default',
-            //         Format: 'tiles',
-            //     }
-            // })
-            // wms.setMap(map)
-
-        });
+        // var wms = new AMap.TileLayer.WMTS({
+        //     url: 'http://t0.tianditu.gov.cn/img_c/wmts',
+        //     // blend: false,
+        //     // tileSize: 256,
+        //     params: {
+        //         // 'Layer': 'img',
+        //         // Version: '1.0.0',
+        //         // Format: 'image/png',
+        //         tk: 'fb2f1e543ab14f984cac70660ff10093',
+        //         STYLE: 'default',
+        //         Format: 'tiles',
+        //     }
+        // })
+        // wms.setMap(map)
 
         // 可以添加建模的内容
         // https://lbs.amap.com/api/javascript-api/example/mesh/3d-gltf
